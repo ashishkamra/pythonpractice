@@ -62,7 +62,14 @@ def both_ends(s,n):
 # where all instances of stra have been replaced by strb.
 def fix_start(s):
   # +++your code here+++
-  return
+  first_char = s[0]
+
+  if s == '':
+    ret_str = ''
+  else:
+    ret_str = first_char + s[1:].replace(first_char, '*') 
+  
+  return ret_str
 
 
 # D. MixUp
@@ -74,8 +81,12 @@ def fix_start(s):
 # Assume a and b are length 2 or more.
 def mix_up(a, b):
   # +++your code here+++
-  return
-
+  a_new = b[0:2] + a[2:]
+  b_new = a[0:2] + b[2:]
+  
+  ret_str = a_new + ' '+ b_new
+  
+  return ret_str
 
 # Provided simple test() function used in main() to print
 # what each function returns vs. what it's supposed to return.
