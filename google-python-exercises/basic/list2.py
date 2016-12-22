@@ -14,7 +14,23 @@
 # modify the passed in list.
 def remove_adjacent(nums):
   # +++your code here+++
-  return
+  
+  # initialize the loop variables
+  nums_l = len(nums)
+  i = 1
+  
+  #loop through the list (in whatever state it is now)
+  while i < nums_l: 
+    if nums[i-1] == nums[i]:
+      del nums[i-1]
+      
+      # reinitialize the loop variables after deleting the element from the list
+      i = 1
+      nums_l -= 1 # same as len(nums)
+    else:
+      i +=1
+    
+  return nums
 
 
 # E. Given two lists sorted in increasing order, create and return a merged
@@ -23,9 +39,36 @@ def remove_adjacent(nums):
 # pass of both lists.
 def linear_merge(list1, list2):
   # +++your code here+++
-  return
 
-# Note: the solution above is kind of cute, but unforunately list.pop(0)
+  if len(list1) <= len(list2):
+    list_small = list1
+    list_big = list2
+  else:
+    list_small = list2
+    list_big = list1
+  
+  j = len(list_big)
+  # reverse traverse he smaller list
+  for elem_ls in reversed(list(list_small)):
+    #print 'testing', elem_ls
+    #print 'against', list_big[:j+1]
+    # shorten the traversal of list_big to index j after every insertion of elem_s
+    for index,elem_lb in reversed(list(enumerate(list_big[:j+1]))):
+      if elem_ls <= elem_lb:
+        if index == 0: # special case if we reach the begining of the list
+          list_big.insert(index, elem_ls)
+        continue
+      
+      #found the right index to insert  
+      list_big.insert(index+1, elem_ls)
+      list_small.pop(-1) # discard the element just inserted
+      j = index # reset the index j to shorten the search space in list_big
+      #print 'list big', list_big
+      #print 'list small', list_small
+      break
+    
+  return list_big
+
 # is not constant time with the standard python list implementation, so
 # the above is not strictly linear time.
 # An alternate approach uses pop(-1) to remove the endmost elements
