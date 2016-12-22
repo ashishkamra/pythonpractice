@@ -1,4 +1,4 @@
-#!/usr/bin/python2.4 -tt
+#!/usr/bin/python -tt
 # Copyright 2010 Google Inc.
 # Licensed under the Apache License, Version 2.0
 # http://www.apache.org/licenses/LICENSE-2.0
@@ -17,7 +17,17 @@
 # Return the resulting string.
 def verbing(s):
   # +++your code here+++
-  return
+  s_len = len(s)
+  
+  if s_len < 3:
+    ret_str = s
+  else:
+    if s[s_len - 3:] == 'ing':
+      ret_str = s + 'ly'
+    else:
+      ret_str = s + 'ing'
+  
+  return ret_str
 
 
 # E. not_bad
@@ -30,9 +40,18 @@ def verbing(s):
 # This dinner is good!
 def not_bad(s):
   # +++your code here+++
-  return
-
-
+  not_i = s.find('not')
+  bad_i = s.find('bad')
+  
+  if not_i != -1 and \
+    bad_i != -1 and \
+    not_i < bad_i:
+    ret_str = s.replace(s[not_i:bad_i+len('bad')], 'good')
+  else:
+    ret_str = s
+    
+  return ret_str
+ 
 # F. front_back
 # Consider dividing a string into two halves.
 # If the length is even, the front and back halves are the same length.
@@ -42,8 +61,24 @@ def not_bad(s):
 #  a-front + b-front + a-back + b-back
 def front_back(a, b):
   # +++your code here+++
-  return
-
+  a_len = len(a)
+  b_len = len(b)
+  
+  if a_len%2 == 0:
+    a_front = a[:a_len/2]
+    a_back = a[a_len/2:]
+  else:
+    a_front = a[:a_len/2 + 1]
+    a_back = a[a_len/2 + 1:]
+  
+  if b_len%2 == 0:
+    b_front = b[:b_len/2]
+    b_back = b[b_len/2:]
+  else:
+    b_front = b[:b_len/2 + 1]
+    b_back = b[b_len/2 + 1:]
+    
+  return a_front + b_front + a_back + b_back
 
 # Simple provided test() function used in main() to print
 # what each function returns vs. what it's supposed to return.
