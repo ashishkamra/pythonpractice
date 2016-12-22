@@ -22,7 +22,13 @@
 # Note: python does not have a ++ operator, but += works.
 def match_ends(words):
   # +++your code here+++
-  return
+  count = 0
+  
+  for str in words:
+    if len(str) >= 2 and str[0] == str[len(str) - 1]:
+      count += 1
+    
+  return count
 
 
 # B. front_x
@@ -34,9 +40,19 @@ def match_ends(words):
 # before combining them.
 def front_x(words):
   # +++your code here+++
-  return
-
-
+  list_x = []
+  list_others = []
+  
+  for str in words:
+    if str[0] == 'x':
+      list_x.append(str)
+    else:
+      list_others.append(str)
+  
+  list_x.sort()
+  list_others.sort()
+  
+  return list_x + list_others
 
 # C. sort_last
 # Given a list of non-empty tuples, return a list sorted in increasing
@@ -46,8 +62,31 @@ def front_x(words):
 # Hint: use a custom key= function to extract the last element form each tuple.
 def sort_last(tuples):
   # +++your code here+++
-  return
-
+  #print 'original tuple list', tuples
+  
+  list_ei = []
+  new_tuples = []
+  
+  #create a new list with last element of every tuple as the first element and the second element as the index from the original list
+  index = 0
+  for tup in tuples:
+    list_ei.append((tup[len(tup) - 1], index))
+    index += 1
+  
+  #print 'list_ei = ', list_ei
+  
+  #now sort this new list
+  list_ei.sort()
+  
+  #print 'sorted list_ei = ', list_ei
+  
+  #now put the tuples back using the index from the sorted list
+  for new_tup in list_ei:
+    new_tuples.append(tuples[new_tup[1]])
+  
+  #print 'rearranged tuples = ', new_tuples
+  
+  return new_tuples
 
 # Simple provided test() function used in main() to print
 # what each function returns vs. what it's supposed to return.
