@@ -15,6 +15,7 @@ class a_node:
     self.data = data
     self.left_node = None
     self.right_node = None
+    self.parent_node = None
 
 # Tree class
 # Class Variables - 
@@ -26,7 +27,8 @@ class BinaryTree:
   def __init__(self, data):
     self.top_node = a_node(data)
     self.num_nodes = 1
-    self.height = 1
+    self.left_height = 1
+    self.right_height = 1
 
   # init
   def __init__(self):
@@ -72,13 +74,14 @@ class BinaryTree:
     node = self.top_node
     height = 0
 
-    # first node - easy
+    # case 1 - first node
     if node is None:
       self.top_node = in_node
       #print("Top node inserted "+str(in_node.data))
       self.num_nodes += 1
       height += 1
-      self.height = height
+      self.left_height = height
+      self.right_height = height
       return 0    
 
     # traverse from top_node to find the right location to insert the node
@@ -91,10 +94,11 @@ class BinaryTree:
       if in_node.data < node.data:
         if node.left_node is None:         # found the place to insert
           node.left_node = in_node
+          node.left_node.parent_node = node
           self.num_nodes += 1
           #print("Node inserted to left "+str(in_node.data))
-          if height > self.height:
-            self.height = height
+          if height > self.left_height:
+            self.left_height = height
           return 0
         else:                              # go on
           node = node.left_node
@@ -105,27 +109,107 @@ class BinaryTree:
       if in_node.data > node.data:
         if node.right_node is None:       # found the place to insert
           node.right_node = in_node
+          node.right_node.parent_node = node
           self.num_nodes += 1
           #print("Node inserted to right "+str(in_node.data))
-          if height > self.height:
-            self.height = height
+          if height > self.right_height:
+            self.right_height = height
           return 0
         else:                             # go on
           node = node.right_node
           height += 1
           continue;      
+
+  # Merge left subtree to right subtree
+  def _merge_right(self, left_subtree, right_subtree):
+    #just go to the left most node of the right subtree and insert there
+    tmp_node = None
+    if right_subtree.left_node is not None:
+      tmp_node = right_subtree.left_node
+      while tmp_node.left_node is not None and tmp_node.right_node is not None:
+        tmp_node = tmp_node.left_node
+    else:
+      tmp_node = right_subtree
     
+    tmp_node.left_node = left_subtree
+    left_subtree.parent_node = tmp_node
+   
   # delete a node
   # Return: 0 - Success, anything else - Failure
-  def delete(self, node):
-    #if self.find(node.data) is not None:
-    pass
+  def delete(self, data):
+    
+    # find the node to delete
+    node = self.find(data)
+
+    if node is not None:  # found the node
+
+      # diagonistics
+      print("node = "+str(node.data))
+      if node.parent_node is not None:
+        print("parent node = "+str(node.parent_node.data))
+      if node.left_node is not None:
+        print("left node = "+str(node.left_node.data))
+      if node.right_node is not None:
+        print("right node = "+str(node.right_node.data))
+     
+      # case 1 edge case - the only node in the tree
+      if node.left_node is None and node.right_node is None and node.parent_node is None:
+        self.top_node = None
+        print("deleted at case 1")
+
+      # case 2 leaf node
+      if node.parent_node is not None and node.left_node is None and node.right_node is None:
+        if node.parent_node.left_node == node:
+          node.parent_node.left_node = None
+        if node.parent_node.right_node == node:
+          node.parent_node.right_node = None
+        print("deleted at case 2")
+
+      # case 3 middle node - no right subtree
+      if node.parent_node is not None and node.right_node is None and node.left_node is not None:
+        if node.parent_node.left_node == node:
+          node.parent_node.left_node == node.left_node
+        elif node.parent_node.right_node == node:
+          node.parent_node.right_node == node.left_node
+        print("deleted at case 3")
+
+      # case 4 middle node - no left subtree
+      if node.parent_node is not None and node.left_node is None and node.right_node is not None:
+        if node.parent_node.left_node == node:
+          node.parent_node.right_node == node.right_node
+        elif node.parent_node.right_node == node:
+          node.parent_node.right_node == node.left_node
+
+        print("deleted at case 4")
+
+      # case 5 both subtrees - need to merge
+      if node.left_node is not None and node.right_node is not None:
+
+        # merge right always - we can merge left as well depending on which on leads to a more balanced tree
+        self._merge_right(node.left_node, node.right_node)      
+
+        if node.parent_node is not None:              # adjust the right node to parent node
+          if node.parent_node.left_node == node:
+            node.parent_node.left_node = node.right_node
+          elif node.parent_node.right_node == node:
+            node.parent_node.right_node = node.right_node
+        else:                                         # make the right node the top node
+          self.top_node = node.right_node
       
+        print("deleted at case 5")
+
+      del node
+      self.num_nodes -= 1
+      return 0
+
+    else:                 # did not find the node
+      return -1
+
 
   # internal function for recursion
   def find_in(self, data, node):
 
-    print("checked "+str(node.data))
+    #print("checked "+str(node.data))
 
     ret_val = None
 
@@ -196,14 +280,14 @@ def main():
   num_list = [num for num in f]
   
   # randomize to get balanced tree
-  random.shuffle(num_list)
+  # random.shuffle(num_list)
 
   # insert numbers one by one
   for num in num_list:
     tree.insert(a_node(int(num)))
     
   # print the tree and vital stats
-  print("tree height = "+str(tree.height))
+  print("tree height = "+str(max(tree.left_height, tree.right_height)))
   print("tree nodes = "+str(tree.num_nodes))
   print("In-order printing the tree")
   tree.print("in")
@@ -220,14 +304,14 @@ def main():
   #else:
   #  print("not found "+str(num_find))
 
-  num_delete = 76
+  num_delete = 5
   if tree.delete(int(num_delete)) == 0:
     print("deleted "+str(num_delete))
   else:
-    print("could not delete the number")
+    print("did not find the number "+str(num_delete))
 
   # print the tree and vital stats
-  print("tree height = "+str(tree.height))
+  print("tree height = "+str(max(tree.left_height, tree.right_height)))
   print("tree nodes = "+str(tree.num_nodes))
   print("In-order printing the tree")
   tree.print("in")
